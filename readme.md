@@ -2,6 +2,8 @@
 
 Simple car game built in Konva JS
 
+Demo: [https://callebokedal.github.io/car-game](https://callebokedal.github.io/car-game)
+
 # Game physics
 https://brm.io/game-physics-for-beginners/
 
