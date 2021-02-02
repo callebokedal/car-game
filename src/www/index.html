@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car</title>
+    <style>
+        #container {
+            background-color: green;
+            width: 600px;
+            1height: 300px;
+            display: block;    
+        }
+        #debug {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            font-weight: bold;
+            color: gray;
+            background-color: black;
+            padding: 5px;
+            margin-top: 10px;
+            width: 300px;
+            height: 4.5em;
+            1display: inline-block;
+            display: none;
+            border-radius: 3px;
+        }
+    </style>
+    <script src="js/konva.min.js"></script>
+</head>
+<body>
+    <div id="container"></div>
+    <div id="debug"></div>
+    <script>
+        var width = 600; //window.innerWidth - 150;
+        var height = window.innerHeight - 150;
+
+        var stage = new Konva.Stage({
+            container: 'container',
+            width: width,
+            height: height,
+        });
+
+        let logEl = document.getElementById("debug");
+        let log = (str) => {
+            logEl.innerHTML = str;
+        }
+        let debugCar = (car) => {
+            if(false) {
+                log("angle: " + car.rotation() + 
+                    "<br>velocity: " + velocity +
+                    "<br>car x: " + car.x() +
+                    "<br>car y: " + car.y());
+            }
+        }
+
+        // Custom icons
+        /*let iconNote = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-left-text" viewBox="0 0 16 16"> \
+            <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4.414A2 2 0 0 0 3 11.586l-2 2V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/> \
+            <path d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6zm0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/> \
+        </svg>'*/
+
+        //var animLayer = new Konva.Layer();
+        var staticLayer = new Konva.Layer();
+        var layer = new Konva.Layer();
+        stage.add(staticLayer, layer);
+
+        var road = new Konva.Line({
+            x: width / 4,
+            y: height / 2,
+            points: [0,0, 0,-150, 150,-150, 300,20, 300,150, 0,150],
+            stroke: 'gray',
+            strokeWidth: 75,
+            //tension: 0,
+            //bezier: true,
+            lineCap: 'round',
+            lineJoin: 'round',
+            closed: true,
+            perfectDrawEnabled: false
+        });
+        var roadLine = new Konva.Line({
+            x: width / 4,
+            y: height / 2,
+            points: [0,0, 0,-150, 150,-150, 300,20, 300,150, 0,150],
+            stroke: 'white',
+            strokeWidth: 3,
+            lineCap: 'round',
+            lineJoin: 'round',
+            dash: [25, 18],
+            closed: true,
+            perfectDrawEnabled: false
+        });
+        staticLayer.add(road, roadLine);
+        staticLayer.batchDraw();
+
+        // Construct a car
+        var body = new Konva.Rect({
+            x: 2,
+            y: 0,
+            width: 10,
+            height: 16,
+            //fill: 'green',
+            fill: 'red',
+            name: 'body',
+            shadowColor: '#3e3e3e',
+            shadowOffset: {x:1, y:1}
+        });
+        var carWindow = new Konva.Rect({
+            x: 3, y: 4,
+            width: 8, height: 2,
+            fill: '#33f'
+        });
+        var tire1 = new Konva.Rect({
+            x: 0, y: 2,
+            width: 2, height: 5,
+            fill: 'black'
+        });
+        var tire2 = new Konva.Rect({
+            x: 12, y: 2,
+            width: 2, height: 5,
+            fill: 'black'
+        });
+        var tire3 = new Konva.Rect({
+            x: 0, y: 9,
+            width: 2, height: 5,
+            fill: 'black'
+        });
+        var tire4 = new Konva.Rect({
+            x: 12, y: 9,
+            width: 2, height: 5,
+            fill: 'black'
+        });
+
+        var car = new Konva.Group({
+            x: width / 4,
+            y: height / 2,
+            offset: {
+                x: 7,
+                y: 8
+            },
+            //rotation: -90,
+            //scaleX: 1.0,
+            //scaleY: 1.0,
+            draggable: false
+        });
+
+        car.add(body, carWindow, tire1, tire2, tire3, tire4);
+        layer.add(car);
+        layer.batchDraw();
+
+        let container = stage.container();
+        // make it focusable
+        container.tabIndex = 1;
+        // focus it
+        // also stage will be in focus on its click
+        container.focus();
+        container.addEventListener('keydown', function (e) {
+            if (e.keyCode === 37) {
+                // Turn left
+                car.rotate(-angleDelta);
+            } else if (e.keyCode === 38) {
+                // Accelerate
+                if(velocity < 100) {
+                    velocity += 10;
+                }
+            } else if (e.keyCode === 39) {
+                // Turn right
+                car.rotate(angleDelta);
+            } else if (e.keyCode === 40) {
+                // Brake
+                if(velocity > -50) {
+                    velocity -= 10;
+                }
+            } else {
+                return;
+            }
+            if(car.rotation() < 0) {
+                car.rotation(360-angleDelta);
+            } else if(car.rotation() > 360) {
+                car.rotation(angleDelta);
+            } else if(car.rotation() === 360) {
+                car.rotation(0);
+            }
+            if(velocity == 0) {
+                anim.stop();
+            } else {
+                anim.start();
+            }
+            /*log("angle: " + car.rotation() + 
+                "<br>velocity: " + velocity +
+                "<br>car x: " + car.x() +
+                "<br>car y: " + car.y());*/
+            //log("tire1 x: " + tire1.absolutePosition().x);
+            //log("car x: " + car.x());
+            debugCar(car);
+            e.preventDefault();
+            //car.cache();
+            layer.batchDraw();
+        });
+
+        const radFactor = 3.1415 / 180;
+        // How fast to turn car
+        const angleDelta = 5;
+        
+        // Utility
+        let gradToRad = (g) => {
+            // vr = vg * pi / 180
+            return g * radFactor;
+        }
+
+        // Visual effect
+        let tireEffectCounter = 0;
+
+        // Speed of car
+        let velocity = 0;
+        let anim = new Konva.Animation(eachFrame, layer);
+
+        function eachFrame(frame) {
+            // update stuff
+            var dist = velocity * (frame.timeDiff / 1000);
+            let angle = car.rotation() + 90;
+
+            let dx = Math.cos(gradToRad(angle)) * dist;
+            let dy = -Math.sin(gradToRad(angle)) * dist;
+
+            if(velocity > 20) {
+
+                tireEffectCounter += velocity;
+                if(tireEffectCounter > 1000) {
+                    tireEffectCounter = 0; // Reset counter
+                    let tire1Effect = tire1.clone({
+                        opacity: 0.2,
+                        x: tire1.absolutePosition().x,
+                        y: tire1.absolutePosition().y,
+                        rotation: car.rotation()
+                    });
+                    let tire2Effect = tire2.clone({
+                        opacity: 0.2,
+                        x: tire2.absolutePosition().x,
+                        y: tire2.absolutePosition().y,
+                        rotation: car.rotation()
+                    });
+                    tire1Effect.cache();
+                    tire2Effect.cache();
+
+                    staticLayer.add(tire1Effect, tire2Effect);
+                    staticLayer.batchDraw(); // Is this correct?
+                }
+            }
+
+            // Don't let car leave screen
+            if(car.x() < 0) {
+                velocity = 0;
+                car.x(0);
+                anim.stop();
+                debugCar(car);
+            } else if(car.y() < 0) {
+                velocity = 0
+                car.y(0);
+                anim.stop();
+                debugCar(car);
+            } else if(car.x() > width) {
+                velocity = 0
+                car.x(width);
+                anim.stop();
+                debugCar(car);
+            } else if(car.y() > height) {
+                velocity = 0
+                car.y(height);
+                anim.stop();
+                debugCar(car);
+            } else {
+                car.move({x: -dx, y: dy});
+                // Intense debugging
+                // debugCar(car);
+            }
+            
+        }
+
+        anim.start();
+    </script>
+</body>
+</html>
