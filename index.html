@@ -194,24 +194,40 @@
         container.focus();
         container.addEventListener('keydown', function (e) {
             if (e.keyCode === 37) {
-                // Turn left
-                car.rotate(-angleDelta);
+                turnLeft();
             } else if (e.keyCode === 38) {
-                // Accelerate
-                if(velocity < 100) {
-                    velocity += 10;
-                }
+                accelerate();
             } else if (e.keyCode === 39) {
-                // Turn right
-                car.rotate(angleDelta);
+                turnRight();
             } else if (e.keyCode === 40) {
-                // Brake
-                if(velocity > -50) {
-                    velocity -= 10;
-                }
+                brake();
             } else {
                 return;
             }
+            moveCar(e);
+        });
+        document.getElementById("left").addEventListener("click", function (e) { turnLeft(); moveCar(e);}); 
+        document.getElementById("right").addEventListener("click", function (e) { turnRight(); moveCar(e);}); 
+        document.getElementById("acc").addEventListener("click", function (e) { accelerate(); moveCar(e);}); 
+        document.getElementById("brake").addEventListener("click", function (e) { brake(); moveCar(e);}); 
+
+        const turnLeft = () => {
+            car.rotate(-angleDelta);
+        }
+        const turnRight = () => {
+                car.rotate(angleDelta);
+        }
+        const accelerate = () => {
+            if(velocity < 100) {
+                velocity += 10;
+            }
+        }
+        const brake = () => {
+            if(velocity > -50) {
+                velocity -= 10;
+            }
+        }
+        const moveCar = (evt) => {
             if(car.rotation() < 0) {
                 car.rotation(360-angleDelta);
             } else if(car.rotation() > 360) {
@@ -224,17 +240,16 @@
             } else {
                 anim.start();
             }
+            debugCar(car);
             /*log("angle: " + car.rotation() + 
                 "<br>velocity: " + velocity +
                 "<br>car x: " + car.x() +
                 "<br>car y: " + car.y());*/
             //log("tire1 x: " + tire1.absolutePosition().x);
             //log("car x: " + car.x());
-            debugCar(car);
-            e.preventDefault();
-            //car.cache();
+            evt.preventDefault();
             layer.batchDraw();
-        });
+        }
 
         const radFactor = 3.1415 / 180;
         // How fast to turn car
