@@ -4,6 +4,9 @@ Simple car game built in Konva JS
 
 Demo: [https://callebokedal.github.io/car-game](https://callebokedal.github.io/car-game)
 
+# Old clasic Rally Speedway - C64
+https://www.c64-wiki.com/wiki/Rally_Speedway
+
 # Game physics
 https://brm.io/game-physics-for-beginners/
 
